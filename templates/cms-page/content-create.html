@@ -1,0 +1,88 @@
+{% extends "partials/base.html" %}
+{% load static %}
+{% block title %}Editors{% endblock title %}
+{% block extra_css %}
+<style>
+    .error {
+        color: red;
+    }
+</style>
+
+{% endblock extra_css %}
+{% block content %}
+<div class="main-content">
+
+    <div class="page-content">
+        <div class="container-fluid">
+
+            {% block pagetitle %}
+            {% include "partials/page-title.html" with pagetitle="Email-Template" title="Customize-Template" %}
+            {% endblock pagetitle %}
+            <div id="jeet"></div>
+            <form method="post" id="cmdpage" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="gen-info-text-input">Title</label>
+                            <input type="text" name="title-content" class="form-control required" placeholder="Enter title" minlength="3">
+                            <div class="invalid-feedback">Please enter your title</div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header align-items-center d-flex">
+                                <h4 class="card-title mb-0">Descriptions</h4>
+                            </div><!-- end card header -->
+
+                            <div class="card-body">
+                                <textarea name="para-content" class="required" id="editor"></textarea>
+                            </div><!-- end card-body -->
+                        </div><!-- end card -->
+                        <div class="col-lg-4 col-md-6">
+                            <div>
+                                <p class="text-muted fw-medium">Status</p>
+
+                                <div class="form-check mb-3">
+                                    <input name="status-check" class="form-check-input" type="checkbox" id="formCheck1">
+                                    <label class="form-check-label" for="formCheck1">
+                                        Active
+                                    </label>
+                                </div>
+
+                            </div>
+
+                        </div><!--end col-->
+                    </div><!-- end col -->
+                </div><!-- end row -->
+                <button class="btn btn-success" type="submit">Submit</button>
+                <a href="{% url 'content-list' %}" class="btn btn-danger" type="submit">Cancel</a>
+            </form>
+        </div><!-- container-fluid -->
+
+    </div><!-- page-content -->
+
+    {% block footer %}
+    {% include "partials/footer.html" %}
+    {% endblock footer %}
+</div><!-- end main-content -->
+
+{% endblock content %}
+{% block extra_js %}
+
+<script>
+    $(document).ready(function () {
+        CKEDITOR.replace('editor');
+
+        $('#cmdpage').validate({
+            ignore: []
+        });
+
+    });
+
+</script>
+
+{% endblock extra_js %}

@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect, HttpResponse
-from .models import UploadImage
+from .models import UploadImage, EmailCrudData
+from CMS.models import ContentData
 from .forms import UploadImageForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .utils import is_superuser
+from django.contrib.auth.decorators import user_passes_test
 # from ...custome import CarDamageDetector
 # from custome import CarDamageDetector
 
@@ -46,7 +50,7 @@ import sys
 #     return predicted_image_bytes
 
 
-@login_required(login_url="/accounts/login/")
+@login_required(login_url="/login/")
 def upload_image(request):
     try:
         if request.method == 'POST':  
@@ -70,3 +74,112 @@ def upload_image(request):
     except Exception as e:
         print("ERROR:>",e)
     return render(request, 'index.html', {'form': form})
+
+
+@login_required(login_url="/login/")
+def dashboard(request):
+    return render(request,'dashboard/dashboard.html')
+
+#------------------------------------------------------------------------------------------
+#-----------------------------------Email-Temp---------------------------------------------
+#------------------------------------------------------------------------------------------
+
+@login_required(login_url="/login/")
+def emailtemp(request):
+    if request.method == 'POST':
+        title = request.POST['title-data']
+        subject = request.POST['subject-data']
+        message = request.POST['message-data']
+        # status = request.POST.get('status-data')
+          # Check if the checkbox is checked
+        status = request.POST.get('status-data', False)
+        if status == 'on':
+            status = True
+        else:
+            status = False
+
+        # print("title:",title,"subject:",subject,"message:",message,"status:",status)
+        userData = EmailCrudData.objects.create(title=title,subject=subject,content=message,status=status)
+
+        if userData:
+            userData.save()
+            messages.success(request,"Template Save")
+            return redirect('email-templets')
+        else:
+            messages.error(request,"Something went wrong")
+            return redirect('email-templetes')
+    return render(request,'admin-page/emailTemplate/email_template.html')
+
+
+@login_required(login_url="/login/")
+def emailtemplist(request):
+    userData = EmailCrudData.objects.all()
+    return render(request,'admin-page/emailTemplate/email_template_list.html',{'data' : userData})
+
+
+@login_required(login_url="/login/")
+def emailtempview(request, slug):
+    EmailData = EmailCrudData.objects.get(slug=slug)
+
+    return render(request,'admin-page/emailTemplate/email_template_view.html',{'data' : EmailData})
+
+
+@login_required(login_url='/login/')
+def emailtempedit(request, slug):
+    editData = EmailCrudData.objects.get(slug=slug)
+    if request.method == 'POST':
+        editData.title = request.POST.get('title-data')
+        editData.subject = request.POST.get('subject-data')
+        editData.content = request.POST.get('message-data')
+        editData.status = bool(request.POST.get('status-data'))
+        editData.save()
+        return redirect('email-templets')
+    return render(request,'admin-page/emailTemplate/email_template_edit.html',{'data' : editData})
+
+
+
+
+#---------------------------------------------------------------------------------------------------
+#--------------------------------------------CMS-Manger---------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+class ContentManager:
+    def contentcreate(request):
+        if request.method == 'POST':
+            title = request.POST['title-content']
+            desciption = request.POST['para-content']
+            status = request.POST.get('status-data', False)
+            if status == 'on':
+                status = True
+            else:
+                status = False
+
+            usercontentData = ContentData.objects.create(title=title,description=desciption,status=status)
+            usercontentData.save()
+
+        return render(request,'cms-page/content-create.html')
+    
+    @login_required(login_url="/login/")
+    def contentlist(request):
+        userData = ContentData.objects.all()
+        return render(request,'cms-page/content-list.html',{'data': userData})
+    
+    
+    @login_required(login_url="/login/")
+    def contentview(request, slug):
+        contentData = ContentData.objects.get(slug=slug)
+
+        return render(request,'cms-page/content-view.html',{'data' : contentData})
+
+
+    @login_required(login_url='/login/')
+    def contentedit(request, slug):
+        editData = ContentData.objects.get(slug=slug)
+        if request.method == 'POST':
+            editData.title = request.POST.get('title-data')
+            editData.description = request.POST.get('message-data')
+            editData.status = bool(request.POST.get('status-data'))
+            print(editData)
+            editData.save()
+            return redirect('content-list')
+        return render(request,'cms-page/content-edit.html',{'data' : editData})

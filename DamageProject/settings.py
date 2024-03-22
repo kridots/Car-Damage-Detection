@@ -10,8 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+from django.contrib.messages import constants as messages
+import environ
+
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-sii=r-+3)4i71a-mh33kwsd#!%)b8fid-+newkwn6%s38y6$3y"
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,7 +37,7 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
-INSTALLED_APPS = [
+DEFAULT_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -40,7 +46,21 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "car_image_detect",
     "api",
+    "CMS",
+    
 ]
+
+THIRDPARTY_APPS = [
+    # Crispy Forms
+    "crispy_forms",
+    'crispy_bootstrap5',
+    'ckeditor',
+    'autoslug',
+]
+
+INSTALLED_APPS = DEFAULT_APPS + THIRDPARTY_APPS
+
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -50,6 +70,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'DamageProject.custom_middleware.SuperuserRequiredMiddleware',
 ]
 
 ROOT_URLCONF = "DamageProject.urls"
@@ -69,6 +90,9 @@ TEMPLATES = [
         },
     },
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 WSGI_APPLICATION = "DamageProject.wsgi.application"
 
@@ -117,15 +141,54 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = "static/"
+STATIC_ROOT = '/static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR,"static")]
+
 
 # Base url to serve media files  
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 MEDIA_URL = '/media/'  
   
 # # Path where media is stored  
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  
 
+# CKEditor Settings
+CKEDITOR_UPLOAD_PATH = 'uploads/'  # Define the upload path for files
+CKEDITOR_IMAGE_BACKEND = "pillow"  # Use pillow as the image processing backend (optional)
+CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'  # Specify the jQuery URL (optional)
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 'auto',
+        'width': 'auto',
+        'filebrowserWindowWidth': 'auto',
+        'filebrowserWindowHeight': 'auto',
+        # 'filebrowserUploadUrl': '/ckeditor/upload/',  # URL to handle file uploads
+        # 'extraPlugins': 'uploadfile',  # Include the 'uploadfile' plugin here
+    },
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+#  Messages customize
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "alert-info",
+    messages.INFO: "alert-info",
+    messages.SUCCESS: "alert-success",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
+}
+
+#SMTP config
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_USE_TLS = True
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL=env("EMAIL_HOST_USER")

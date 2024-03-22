@@ -1,0 +1,71 @@
+{% extends "partials/base.html" %}
+{% load static %}
+{% block title %}Editors{% endblock title %}
+{% block extra_css %}
+    <!-- quill css -->
+    <link href="{% static 'libs/quill/dist/quill.snow.css'%}" rel="stylesheet" type="text/css" />
+{% endblock extra_css %}
+{% block content %}
+<div class="main-content">
+    <div class="page-content">
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-title">Email Template View</h5>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{% url 'email-templets' %}" class="btn btn-primary">Back</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Title:</th>
+                                    <td>{{ data.title }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Subject:</th>
+                                    <td>{{ data.subject }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Content:</th>
+                                    <td>{{ data.content | safe }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td>{{ data.status }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% block footer %}
+{% include "partials/footer.html" %}
+{% endblock footer %}
+</div><!-- end main-content -->
+
+{% endblock content %}
+{% block extra_js %}
+<!-- ckeditor -->
+<script src="{% static 'libs/@ckeditor/ckeditor5-build-classic/build/ckeditor.js'%}"></script>
+
+<!-- quill js -->
+<script src="{% static 'libs/quill/dist/quill.min.js'%}"></script>
+
+<!-- init js -->
+<script src="{% static 'js/pages/form-editor.init.js'%}"></script>
+
+{% endblock extra_js %}

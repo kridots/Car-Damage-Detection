@@ -18,13 +18,31 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from django.conf.urls.static import static 
+from django.conf.urls.static import static
+from car_image_detect.views import upload_image
+from ckeditor_uploader import views as ckeditor_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('',include('car_image_detect.urls')),
+    path('upload/',upload_image, name='upload_img'),
+    path('',include('accounts.urls')),
+    path('administer/',include('car_image_detect.urls')),
     path('api/',include('api.urls')),
-    path('accounts/',include('accounts.urls')),
+    # # path('administer/',include('CMS.urls')),
+    # path('ckeditor/upload', include('ckeditor_uploader.urls')),
+
+
+    # path('/',include('frented')),
+    # path('administer', include('admin')),
 ]
+
 if settings.DEBUG:  
-        urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)  
+    urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+
+    # serving media files only on debug mode
+    urlpatterns += [
+        path(r'^media/(?P<path>.*)$', static, {
+            'document_root': settings.MEDIA_ROOT
+        }),
+    ]
+    

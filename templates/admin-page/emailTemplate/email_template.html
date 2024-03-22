@@ -1,0 +1,113 @@
+{% extends "partials/base.html" %}
+{% load static %}
+{% block title %}Editors{% endblock title %}
+{% block extra_css %}
+<style>
+.error{
+    color: red;
+}
+</style>
+{% endblock extra_css %}
+{% block content %}
+
+<div class="main-content">
+ 
+    <div class="page-content">
+        <div class="container-fluid">
+
+            {% block pagetitle %}
+            {% include "partials/page-title.html" with pagetitle="Email-Template" title="Customize-Template" %}
+            {% endblock pagetitle %}
+            <form action="#" id="cmdpage" method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="gen-info-text-input">Title</label>
+                            <input type="text" name="title-data" class="form-control required" placeholder="Enter title" minlength="3">
+                            <div class="invalid-feedback">Please enter your title</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label" for="gen-info-username-input">Subject</label>
+                            <input type="text" name="subject-data" class="form-control required" id="gen-info-username-input" placeholder="Enter subject" minlength="5">
+                            <div class="invalid-feedback">Please enter a Subject</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header align-items-center d-flex">
+                                <h4 class="card-title mb-0">Message</h4>
+                            </div><!-- end card header -->
+
+                            <div class="card-body">
+                                <textarea name="message-data" class="required" id="editor"></textarea>
+                              
+                            </div><!-- end card-body -->
+                        </div><!-- end card -->
+                        <div class="col-lg-4 col-md-6">                                                    
+                            <div>   
+                                <p class="text-muted fw-medium">Status</p>
+                                
+                                <div class="form-check mb-3">
+                                    <input name="status-data" class="form-check-input" type="checkbox" id="formCheck1">
+                                    <label class="form-check-label" for="formCheck1">
+                                        Active
+                                    </label>
+                                </div>                                                        
+                            
+                            </div>
+                         
+                        </div><!--end col-->
+                    </div><!-- end col -->
+                </div><!-- end row -->
+                <button class="btn btn-success" type="submit">Submit</button>
+                <a href="{% url 'email-templets' %}" class="btn btn-danger" type="submit">Cancel</a>
+            </form>
+        </div><!-- container-fluid -->
+        
+    </div><!-- page-content -->
+    
+    
+    {% block footer %}
+    {% include "partials/footer.html" %}
+    {% endblock footer %}
+</div><!-- end main-content -->
+
+{% endblock content %}
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        CKEDITOR.replace('editor');
+
+        $('#cmdpage').validate({
+            ignore: []
+        });
+    });
+</script>
+
+
+  <!-- Add CKEditor script -->
+<!-- <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
+<script>
+    // Initialize CKEditor
+    ClassicEditor
+        .create(document.querySelector('.ckeditor-classic'),{
+            plugins: [ Essentials, Paragraph, Bold, Italic ],
+		    toolbar: [ 'bold', 'italic' ]
+        })
+        .then(editor => {
+            console.log(editor);
+            // Update hidden input field with CKEditor content on change
+            editor.model.document.on('change:data', () => {
+                document.getElementById('message-data').value = editor.getData();
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script> -->
+{% endblock extra_js %}
